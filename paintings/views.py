@@ -1,9 +1,4 @@
-from django.http import HttpResponse, JsonResponse
-from django.views.generic import ListView
-from django.shortcuts import render, redirect
-from .models import Painting, User
-from django.urls import reverse
-from django.contrib.auth import logout
+from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.urls import reverse
@@ -18,7 +13,7 @@ from .models import Painting, User
 
 
 def sign_up_or_in(request):
-    if request.user and request.user.is_authenticated:
+    if request.user.is_authenticated:
         return redirect(reverse("paintings:home"))
 
     most_liked_paint = Painting.objects.all().order_by("-like_count")
@@ -53,10 +48,13 @@ class HomeView(ListView):
 @login_required(login_url="/")
 def create(request):
     if request.method == "POST":
-        img_file = request.FILES["img"]
-        img_file.name = request.POST["title"]
-        Painting.objects.create(owner_id=request.user.id, image=img_file)
-        return JsonResponse({"msg": "success"})
+        user = request.user
+        img_file = request.FILES["upload_img"]
+        title = request.POST['title']
+        style = request.POST['style']
+        paint = request.POST['painting']
+        Painting.objects.create(title=title, owner=user, upload_image=img_file, image=paint, style=style)
+        return JsonResponse({"msg": "Post 작성"})
     return render(request, "create.html")
 
 
@@ -76,6 +74,7 @@ def log_out(request):
         print("ho")
         logout(request)
     return redirect(reverse("paintings:sign_up_or_in"))
+
 
 
 def avatar(request):

@@ -24,9 +24,9 @@ class Painting(TimeStampedModel):
 
     title = models.CharField(max_length=150)
     owner = models.ForeignKey("User", related_name="paintings", on_delete=models.CASCADE)
-
     upload_image = models.FileField(upload_to="upload_images", blank=True)
     image = models.ImageField(upload_to="paintings", blank=True)
+    style = models.CharField(max_length=150, null=True)
     like_count = models.IntegerField(default=0)
 
     def __str__(self):
@@ -60,6 +60,8 @@ class Like(TimeStampedModel):
 
 
 class User(AbstractUser):
+    class Meta:
+        db_table = 'user'
     avatar = models.ImageField(upload_to="avatars", default="avatars/sparta.png")
 
     class Meta:

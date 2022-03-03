@@ -2,6 +2,8 @@ __pycache__/
 
 db.sqlite3
 
+
+
 config/config
 .env
 uploads
@@ -10,8 +12,10 @@ local_settings.py
 
 
 # Byte-compiled / optimized / DLL files
-__pycache__/
+
 *.py[cod]
+
+
 
 .ebextensions/
 # Elastic Beanstalk Files
@@ -20,3 +24,4 @@ __pycache__/
 !.elasticbeanstalk/*.global.yml
 
 Procfile
+

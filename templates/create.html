@@ -2,78 +2,205 @@
 {% block title %} Seukka | Generate {% endblock %}
 {% block css %}
     <style>
-        .insertStyleImg1{
-            content: url("https://storage.googleapis.com/download.tensorflow.org/example_images/Vassily_Kandinsky%2C_1913_-_Composition_7.jpg");
-            height: 100px;
-            width: 100px;
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            width: 1200px;
+
         }
-        .insertStyleImg2{
-            content: url("https://mblogthumb-phinf.pstatic.net/20160424_234/ohyh45_1461464386465kdX9O_PNG/1.png?type=w2");
-            height: 100px;
-            width: 100px;
+
+
+        .style-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-        .insertStyleImg3{
-            content: url("https://t1.daumcdn.net/cfile/tistory/9984444A5BB495A00E");
-            height: 100px;
-            width: 100px;
+
+        .form-control {
+            max-width: 300px;
         }
+
+        h4 {
+            background-color: #ffaf34;
+            border-radius: 5px;
+            padding: 0.3% 5%;
+            margin: 15px 0;
+        }
+        {########## 파일 이미지 넣기 #############}
+        canvas {
+            width: 200px;
+            height: 200px;
+            border: 1px solid black;
+            margin-bottom: 1%;
+        }
+
+
+        {# ######## 라디오 꾸미기#########}
+        .radio-img {
+            background-color: white;
+            padding: 2% 2%;
+            margin-bottom: 1%;
+        }
+
+        .radio-img input[type="radio"] {
+            display: none;
+        }
+
+        .radio-img input[type="radio"]:checked + img {
+            border: 4px solid #ffaf34;
+        }
+
+        .radio-img img {
+            margin: 2% 2%;
+            transition: .4s;
+            cursor: pointer;
+            border: 4px solid transparent;
+            width: 200px;
+            height: 160px;
+        }
+
+        {#################################}
+        #preview {
+            margin: 2% 0;
+        }
+        #create {
+            margin-bottom: 10%;
+        }
+
+
     </style>
 {% endblock css %}
 {% block content %}
-    <label for="title">제목</label>
-    <input type="text" name="title" id="title">
-    <label for="upload_img">사진</label>
-    <input type="file" name="upload_img" id="upload_img">
-    <ul style="list-style:none;">
-        <li>
-            <input type="radio" name="styleImg" value="LSD">
-            <label class="insertStyleImg1"></label>
-        </li>
-        <li>
-            <input type="radio" name="styleImg" value="tiger">
-            <label class="insertStyleImg2"></label>
-        </li>
-        <li>
-            <input type="radio" name="styleImg" value="kkm">
-            <label class="insertStyleImg3"></label>
-        </li>
-    </ul>
-    <button id="paint-submit">전송</button>
-    <img id="preview" src="">
+    <div class="container">
+        <h4>Title</h4>
+        <input type="text" name="title" id="title">
+        {#        <div class="filebox">#}
+        {#            <label for="uplaod_img">Select base picture</label>#}
+        {#            <input type="file" name="upload_img" id="uplaod_img" accept="image/*">#}
+        {#        </div>#}
+        {#        <input type="file" name="upload_img" id="upload_img" accept="image/*">#}
+
+        <script src="http://www.dukelearntoprogram.com/course1/common/js/image/SimpleImage.js"></script>
+
+        <h4>Select base picture</h4>
+
+        <canvas id="can"></canvas>
+
+        <input type="file" multiple="false" accept="image/*" id="upload_img" name="upload_img" onchange="upload()"/>
+
+        <h4>Choose style options</h4>
+
+
+        <div class="radio-img">
+            <label>
+                <input type="radio" name="radio" value="LSD">
+                <img src="https://tekken.s3.ap-northeast-2.amazonaws.com/LSD.jpg">
+            </label>
+            <label>
+                <input type="radio" name="radio" value="drug">
+                <img src="https://tekken.s3.ap-northeast-2.amazonaws.com/drug.jpg" alt="drug">
+            </label>
+            <label>
+                <input type="radio" name="radio" value="drug2">
+                <img src="https://tekken.s3.ap-northeast-2.amazonaws.com/drug2.jpg" alt="drug2">
+            </label>
+            <label>
+                <input type="radio" name="radio" value="drug3">
+                <img src="https://tekken.s3.ap-northeast-2.amazonaws.com/drug3.jpg" alt="drug3">
+            </label>
+            <label>
+                <input type="radio" name="radio" value="drug4">
+                <img src="https://tekken.s3.ap-northeast-2.amazonaws.com/drug4.jpg" alt="drug4">
+            </label>
+            <label>
+                <input type="radio" name="radio" value="hush">
+                <img src="https://tekken.s3.ap-northeast-2.amazonaws.com/hush.jpg" alt="hush">
+            </label>
+            <label>
+                <input type="radio" name="radio" value="kkm">
+                <img src="https://tekken.s3.ap-northeast-2.amazonaws.com/kkm.jpg" alt="kkm">
+            </label>
+
+        </div>
+
+        <button id="paint-submit" class="btn btn-warning">Start Convert</button>
+        <img id="preview" src="">
+
+        <button id="create" class="btn btn-warning">Create Post</button>
+    </div>
 
 {% endblock %}
 {% block script %}
-<script>
-    const preview = document.getElementById('preview')
-    const submitBtn = document.getElementById('paint-submit')
-    submitBtn.addEventListener('click',(e)=>{
-        e.preventDefault()
-        const title = document.getElementById('title').value
-        const style = $("input[name=styleImg]:checked").val()
-        const img = $('#upload_img')[0].files[0]        
-        const img_form_data = new FormData()
-        img_form_data.append('img',img)
-        img_form_data.append('title',title)
-       
-        $.ajax({
-            type:"POST",
-            url:`http://183.97.229.232:5000/hello/${title}&${style}`,
-            contentType : false,
-            processData : false,
-            data: img_form_data ,
-            dataType:"JSON",
-            // 성공하면 preview의 src에 url넣어 출력
-            success : function(json) {
-                console.log(json)
-                preview.src = json['hello']
-            }
-            });
-    })
-    // csrf token
-    $.ajaxSetup({
-        headers: { "X-CSRFToken": '{{csrf_token}}' }
-      });
 
-</script>
+    <script>
+        function upload() {
+            let imgCanvas = document.getElementById("can");
+            let fileInput = document.getElementById("upload_img");
+            let image = new SimpleImage(fileInput);
+            image.drawTo(imgCanvas);
+        }
+
+        const createBtn = document.getElementById('create')
+        createBtn.addEventListener('click', (e) => {
+            e.preventDefault()
+            const title = document.getElementById('title').value
+            const style = $("input[name=radio]:checked").val()
+            const upload_img = $('#upload_img')[0].files[0]
+            const painting = document.getElementById('preview').src
+            const form_data = new FormData()
+            form_data.append('title', title) //title
+            form_data.append('style', style)//style
+            form_data.append('painting', painting)//painting
+            form_data.append('upload_img', upload_img) //img
+
+            $.ajax({
+                type: "POST",
+                url: '/create/',
+                contentType: false,
+                processData: false,
+                data: form_data,
+                dataType: "JSON",
+                success: function (json) {
+                    alert(json['msg'])
+                }
+            });
+
+        })
+        const preview = document.getElementById('preview')
+        const submitBtn = document.getElementById('paint-submit')
+        submitBtn.addEventListener('click', (e) => {
+            e.preventDefault()
+            const title = document.getElementById('title').value
+            const style = $("input[name=radio]:checked").val()
+            const upload_img = $('#upload_img')[0].files[0]
+
+            //인공지능 서버 스키마랑 같아야함. file, name, style
+            const form_data = new FormData()
+            form_data.append('file', upload_img)
+            form_data.append('name', title)
+            form_data.append('style', style)
+            $.ajax({
+                type: "POST",
+                url: `http://183.97.229.232:5000/hello/${title}&${style}`,
+                contentType: false,
+                processData: false,
+                data: form_data,
+                dataType: "JSON",
+                // 성공하면 preview의 src에 url넣어 출력
+                success: function (json) {
+                    console.log(json)
+                    preview.src = json['hello']
+                }
+            });
+        })
+        // csrf token
+        $.ajaxSetup({
+            headers: {"X-CSRFToken": '{{csrf_token}}'}
+        });
+
+
+    </script>
 
 {% endblock %}
